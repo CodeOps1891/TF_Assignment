@@ -17,29 +17,39 @@ jobs:
       # Step 1: Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      # Step 2: Install Terraform
+      - name: Install Terraform
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
+          unzip terraform_1.5.7_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform -version
       
-      # Step 2: Log in to Azure CLI using the Azure Login Action
+      # Step 3: Log in to Azure CLI using the Azure Login Action
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Initialize Terraform
+      # Step 4: Initialize Terraform
       - name: Terraform init
         run: |
           terraform init
 
-      # Step 4: Validate Terraform templates
+      # Step 5: Validate Terraform templates
       - name: Terraform validate
         run: |
           terraform validate
       
-      # step 5: Plan Terraform Changes
+      # step 6: Plan Terraform Changes
       - name: Terraform plan
         run: |
           terraform plan
       
-      # step 6: Apply Terraform Changes
+      # step 7: Apply Terraform Changes
       - name: tf apply
         run: |
           echo "Creating Terraform Infra"
