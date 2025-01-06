@@ -27,34 +27,24 @@ jobs:
           unzip terraform_1.5.7_linux_amd64.zip
           sudo mv terraform /usr/local/bin/
           terraform -version
-      
-      # Step 3: Set Azure Environment Variables
-      - name: Set Azure Environment Variables
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: echo "Azure environment variables set for Terraform."
+
+      # Step 3: Azure Login Using Credentials JSON
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Step 4: Initialize Terraform
       - name: Terraform init
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: terraform init
 
       # Step 5: Validate Terraform templates
       - name: Terraform validate
-        run: |
-          terraform validate
+        run: terraform validate
       
       # step 6: Plan Terraform Changes
       - name: Terraform plan
-        run: |
-          terraform plan
+        run: terraform plan
       
       # step 7: Apply Terraform Changes
       - name: tf apply
