@@ -44,7 +44,7 @@ variable "rg-location" {
 }
 
 variable "rg-name" {
-  description = "Name of the resource group"
+  description = "Resource Group Name"
   type        = string
 }
 
@@ -67,7 +67,7 @@ variable "subnets" {
 }
 
 variable "nsg_name" {
-  description = "Name of the network security group"
+  description = "Name of the network security groups"
   type        = string
 }
 
