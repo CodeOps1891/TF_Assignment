@@ -1,0 +1,13 @@
+************* Terraform Pre-Req   ***********
+az-login
+az ad sp create-for-rbac -n az-demo --role="Contributor" --scopes="/subscriptions/1938d1bc-8ce3-4a88-9339-19c8a619a5dc"  ( create sp and get Contributor role )
+
+// Set Env Vars
+    export ARM_CLIENT_ID=""
+    export ARM_CLIENT_SECRET=""
+    export ARM_SUBSCRIPTION_ID=""
+    export ARM_TENANT_ID=""
+
+************* Terraform helping   ***********
+terraform -install-autocomplete  ( to autocomplete commands )
+alias tf=terraform ( to create alias of terraform )

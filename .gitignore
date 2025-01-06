@@ -1,0 +1,26 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# *.tfvars  ( it should be added in crucial projects )
+
+
+# Terraform provider-specific files
+.terraform/
+.terraform.lock.hcl
+
+# Crash logs
+crash.log
+
+# Override files used to customize settings ( add all below if required )
+# override.tf
+# override.tf.json
+# *_override.tf
+# *_override.tf.json
+
+# Plan files
+# *.tfplan ( add if required )
+
+# Binary or executable files
+# terraform.tfplan  ( add if required )
+
