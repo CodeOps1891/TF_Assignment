@@ -97,7 +97,7 @@ variable "vmss_instances" {
 }
 
 variable "admin_username" {
-  description = "Admin username for VMs"
+  description = "Admin username for Virtual Machines"
   type        = string
 }
 
