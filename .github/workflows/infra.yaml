@@ -1,0 +1,46 @@
+name: "Deploy Terraform Pipeline for infra for connecting mysqlDB and wordpress"
+
+on:
+  push:
+    paths:
+      - 'modules/**'
+      - '*.tf'
+      - '*.tfvars'
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      # Step 2: Log in to Azure CLI using the Azure Login Action
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 3: Initialize Terraform
+      - name: Terraform init
+        run: |
+          terraform init
+
+      # Step 4: Validate Terraform templates
+      - name: Terraform validate
+        run: |
+          terraform validate
+      
+      # step 5: Plan Terraform Changes
+      - name: Terraform plan
+        run: |
+          terraform plan
+      
+      # step 6: Apply Terraform Changes
+      - name: tf apply
+        run: |
+          echo "Creating Terraform Infra"
+          terraform apply --auto-approve
