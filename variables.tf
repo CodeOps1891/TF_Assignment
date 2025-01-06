@@ -87,7 +87,7 @@ variable "nsg_rules" {
 }
 
 variable "vmss_name" {
-  description = "Name of the VMSS"
+  description = "Virtual Machine ScaleSet (VMSS) Name"
   type        = string
 }
 
