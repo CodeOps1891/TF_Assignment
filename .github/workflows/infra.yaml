@@ -1,53 +1,87 @@
-name: "Deploy Terraform Pipeline for infra for connecting mysqlDB and wordpress"
+name: 'Terraform Azure Deploy'
 
 on:
   push:
+    branches:
+      - main
     paths:
-      - 'modules/**'
-      - '*.tf'
-      - '*.tfvars'
+      - '**.tf'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.tf'
 
-  workflow_dispatch:
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
-  deploy:
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
-    
+    environment: production
+
     steps:
-      # Step 1: Checkout Code
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      # Step 2: Install Terraform
-      - name: Install Terraform
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y wget unzip
-          wget https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
-          unzip terraform_1.5.7_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
-          terraform -version
+    - name: Setup Azure CLI
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Azure Login Using Credentials JSON
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: '1.5.0'
 
-      # Step 4: Initialize Terraform
-      - name: Terraform init
-        run: terraform init
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
 
-      # Step 5: Validate Terraform templates
-      - name: Terraform validate
-        run: terraform validate
-      
-      # step 6: Plan Terraform Changes
-      - name: Terraform plan
-        run: terraform plan
-      
-      # step 7: Apply Terraform Changes
-      - name: tf apply
-        run: |
-          echo "Creating Terraform Infra"
-          terraform apply --auto-approve
+    - name: Terraform Init
+      id: init
+      run: |
+        terraform init \
+          -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP }}" \
+          -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT }}" \
+          -backend-config="container_name=${{ secrets.BACKEND_CONTAINER }}" \
+          -backend-config="key=${{ secrets.BACKEND_KEY }}"
+
+    # Terraform Plan
+      # (1) Only runs on Pull Requests (2) Creates an execution plan showing what will be changed (3) Posts the plan as a comment on the PR
+    - name: Terraform Plan   
+      id: plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan -no-color
+      continue-on-error: false  
+
+    - name: Update Pull Request
+      uses: actions/github-script@v6           # Uses GitHub's JavaScript action to interact with GitHub API
+      if: github.event_name == 'pull_request'  # Trigger step only incase of pull_request
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"  # Create env var PLAN containing output from prev plan step, references the standard output from the plan step
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}   # It is used for authentication
+        script: | # Create a formatted comment on PR
+          const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\` 
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+          <details><summary>Show Plan</summary>
+          \`\`\`\n
+          ${process.env.PLAN}
+          \`\`\`
+          </details>`;
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.name,
+            body: output
+          })
+
+      # Terraform Apply
+      # (1) Only runs on Push event on main branch
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
