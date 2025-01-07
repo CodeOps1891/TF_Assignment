@@ -10,18 +10,18 @@
 
 # *********************************** Above for when develop infra using one main.tf file
 
-rg-location       = "eastus"
-rg-name        = "ar-rg"
-vnet_name      = "example-vnet"
-address_space  = ["10.0.0.0/16"]
+rg-location   = "eastus"
+rg-name       = "ar-rg"
+vnet_name     = "example-vnet"
+address_space = ["10.0.0.0/16"]
 
 subnets = [
   {
-    name            = "subnetA"
+    name             = "subnetA"
     address_prefixes = ["10.0.1.0/24"]
   },
   {
-    name            = "subnetB"
+    name             = "subnetB"
     address_prefixes = ["10.0.2.0/24"]
   }
 ]
@@ -30,44 +30,44 @@ nsg_name = "app-nsg"
 
 nsg_rules = {
   ssh = {
-    name                        = "SSH-Rule"
-    priority                    = 100
-    direction                   = "Inbound"
-    access                      = "Allow"
-    protocol                    = "Tcp"
-    source_port_range           = "*"
-    destination_port_range      = "22"
-    source_address_prefix       = "*"
-    destination_address_prefix  = "*"
+    name                       = "SSH-Rule"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   },
   http = {
-    name                        = "HTTP-Rule"
-    priority                    = 110
-    direction                   = "Inbound"
-    access                      = "Allow"
-    protocol                    = "Tcp"
-    source_port_range           = "*"
-    destination_port_range      = "80"
-    source_address_prefix       = "*"
-    destination_address_prefix  = "*"
+    name                       = "HTTP-Rule"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   },
   mysql = {
-    name                        = "MySQL-Rule"
-    priority                    = 120
-    direction                   = "Inbound"
-    access                      = "Allow"
-    protocol                    = "Tcp"
-    source_port_range           = "*"
-    destination_port_range      = "3306"
-    source_address_prefix       = "*"
-    destination_address_prefix  = "*"
+    name                       = "MySQL-Rule"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3306"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 }
 
-vmss_name       = "wp-vmss"
-vmss_instances  = 2
-admin_username  = "adminuser"
-admin_password  = "P@ssw0rd1234!"
+vmss_name      = "wp-vmss"
+vmss_instances = 2
+admin_username = "adminuser"
+admin_password = "P@ssw0rd1234!"
 
 lb_name = "web-lb"
 lb_sku  = "Standard"

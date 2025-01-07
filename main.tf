@@ -282,18 +282,18 @@
 
 # Resource Group Module
 module "resource_group" {
-  source        = "./modules/resource-group"
-  rg-name       = var.rg-name
-  rg-location   = var.rg-location
+  source      = "./modules/resource-group"
+  rg-name     = var.rg-name
+  rg-location = var.rg-location
 }
 
 # Network Security Group Module
 module "nsg" {
-  source                = "./modules/azure-nsg"
-  nsg-name              = var.nsg_name
-  location              = module.resource_group.location
-  resource_group_name   = module.resource_group.name
-  rules                 = var.nsg_rules
+  source              = "./modules/azure-nsg"
+  nsg-name            = var.nsg_name
+  location            = module.resource_group.location
+  resource_group_name = module.resource_group.name
+  rules               = var.nsg_rules
 }
 
 # Network Module
@@ -308,52 +308,52 @@ module "network" {
 }
 
 module "vmfor_db" {
-  source                        = "./modules/azure-vm-db"
-  custom_data                   = base64encode(local.custom_data_db)
-  vm_name                       = "db-vm"
-  resource_group_name           = module.resource_group.name
-  location                      = module.resource_group.location
-  vm_size                       = "Standard_B1s"
-  admin_username                  = "adminuser"
-  admin_password                  = "P@ssw0rd1234!"
-  subnet_id                     = module.network.subnet_ids[1]
+  source              = "./modules/azure-vm-db"
+  custom_data         = base64encode(local.custom_data_db)
+  vm_name             = "db-vm"
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+  vm_size             = "Standard_B1s"
+  admin_username      = "adminuser"
+  admin_password      = "P@ssw0rd1234!"
+  subnet_id           = module.network.subnet_ids[1]
 }
 
 # Load Balancer Module
 module "load_balancer" {
-  source                   = "./modules/azure-lb"
-  lb_public_ip_name        = "lb-public-ip"
-  resource_group_name      = module.resource_group.name
-  location                 = module.resource_group.location
-  lb_name                  = var.lb_name
-  lb_sku                   = var.lb_sku
-  frontend_ip_config_name  = "frontend-config"
-  backend_pool_name        = "backend-pool"
-  probe_name               = "health-probe"
-  probe_protocol           = "Tcp"
-  probe_port               = 80
-  lb_rule_name             = "lb-rule"
-  lb_rule_protocol         = "Tcp"
-  lb_rule_frontend_port    = 80
-  lb_rule_backend_port     = 80
+  source                  = "./modules/azure-lb"
+  lb_public_ip_name       = "lb-public-ip"
+  resource_group_name     = module.resource_group.name
+  location                = module.resource_group.location
+  lb_name                 = var.lb_name
+  lb_sku                  = var.lb_sku
+  frontend_ip_config_name = "frontend-config"
+  backend_pool_name       = "backend-pool"
+  probe_name              = "health-probe"
+  probe_protocol          = "Tcp"
+  probe_port              = 80
+  lb_rule_name            = "lb-rule"
+  lb_rule_protocol        = "Tcp"
+  lb_rule_frontend_port   = 80
+  lb_rule_backend_port    = 80
 }
 
 # VMSS for WordPress Module
 module "vmssfor_wordpress" {
-  depends_on = [ module.vmfor_db ]
-  source                        = "./modules/azure-vmss-wordpress"
-  vmss_name                     = var.vmss_name
-  resource_group_name           = module.resource_group.name
-  location                      = module.resource_group.location
-  vm_size                       = "Standard_B1s"
-  instances                     = var.vmss_instances
-  admin_username                = var.admin_username
-  admin_password                = var.admin_password
-  custom_data                   = base64encode(local.custom_data_wp)
-  upgrade_mode                  = "Automatic"
-  os_disk_storage_account_type  = "Standard_LRS"
-  os_disk_caching               = "ReadWrite"
-  nic_name                      = "vmss-nic"
-  subnet_id                     = module.network.subnet_ids[0]
-  backend_address_pool_ids      = [module.load_balancer.backend_pool_id]
+  depends_on                   = [module.vmfor_db]
+  source                       = "./modules/azure-vmss-wordpress"
+  vmss_name                    = var.vmss_name
+  resource_group_name          = module.resource_group.name
+  location                     = module.resource_group.location
+  vm_size                      = "Standard_B1s"
+  instances                    = var.vmss_instances
+  admin_username               = var.admin_username
+  admin_password               = var.admin_password
+  custom_data                  = base64encode(local.custom_data_wp)
+  upgrade_mode                 = "Automatic"
+  os_disk_storage_account_type = "Standard_LRS"
+  os_disk_caching              = "ReadWrite"
+  nic_name                     = "vmss-nic"
+  subnet_id                    = module.network.subnet_ids[0]
+  backend_address_pool_ids     = [module.load_balancer.backend_pool_id]
 }
