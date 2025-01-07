@@ -54,7 +54,7 @@ variable "vnet_name" {
 }
 
 variable "address_space" {
-  description = "Address space for the virtual network"
+  description = "Virtual Network Address Space"
   type        = list(string)
 }
 
